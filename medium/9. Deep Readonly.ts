@@ -39,7 +39,7 @@
 
 type DeepReadonly<T> = {
     readonly [P in keyof T]: keyof T[P] extends undefined ? T[P] : DeepReadonly<T[P]>
-}
+  }
 
 /* _____________ Test Cases _____________ */
 import { Equal, Expect } from '@type-challenges/utils'

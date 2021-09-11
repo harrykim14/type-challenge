@@ -206,3 +206,127 @@ type Chainable<R extends {} = {}> = {
 ```
 
 <hr/>
+
+### 15. Last of Array
+
+> 주어진 배열 `T`의 마지막 인자를 갖는 제네릭 `Last<T>`를 구현하세요.
+
+```ts
+// 예시
+type arr1 = ['a', 'b', 'c']
+type arr2 = [3, 2, 1]
+
+type tail1 = Last<arr1> // expected to be 'c'
+type tail2 = Last<arr2> // expected to be 1
+```
+
+```ts
+// 배열을 spread operation을 사용해 마지막 요소와 나머지로 나누고 마지막 요소만을 리턴
+type Last<T extends unknown[]> = T extends [...remains: unknown, last: infer L] ? L : never;
+```
+
+<hr />
+
+### 16. Pop
+
+> 주어진 배열 `T`에서 마지막 요소를 제외한 배열을 가지는 제네릭 `Pop<T>`를 구현하세요.
+
+```ts
+// 예시
+type arr1 = ['a', 'b', 'c', 'd']
+type arr2 = [3, 2, 1]
+
+type re1 = Pop<arr1> // expected to be ['a', 'b', 'c']
+type re2 = Pop<arr2> // expected to be [3, 2]
+```
+
+```ts
+// 15번 Last of Array와 반대로 접근하여 배열의 마지막 값을 제외한 나머지 타입을 리턴
+type Pop<T extends unknown[]> = T extends [...remains: infer R, last: unknown] ? R : never; 
+```
+
+<hr />
+
+### 20. Promise.all
+
+> Promise처럼 생긴 하나의 객체를 받고, 그 반환값이 Promise 상태에서 해제된 값(`Promise<T>`)의 타입을 갖는 함수 `PromiseAll`의 타입을 정의하세요.
+
+```ts
+// 예제
+const promise1 = Promise.resolve(3);
+const promise2 = 42;
+const promise3 = new Promise<string>((resolve, reject) => {
+  setTimeout(resolve, 100, 'foo');
+});
+
+// expected to be `Promise<[number, number, string]>`
+const p = Promise.all([promise1, promise2, promise3] as const)
+```
+
+```ts
+// PromiseAll이 갖는 매개변수 value는 튜플 구조를 갖는 배열이므로 readonly 처리된 [...T]가 된다
+declare function PromiseAll<T extends unknown[]>(values: readonly [...T]): Promise<{
+    [P in keyof T]: T[P] extends Promise<infer R> ? R : T[P]
+    // 반환형의 Promise는 해당 키 값(T[P])이 만약 Promise라면 해당 Promise가 갖는 제네릭의 타입(infer R)을 반환하며 Promise가 아니라면 그대로 T[P]를 반환하도록 함
+}>
+```
+
+<hr />
+
+### 62. Type Lookup
+
+> 가끔은 우리가 유니온 속성을 통해 속성 내부를 들여다보고 싶을 때가 있습니다.
+> 이번 챌린지에서는 `type` 필드를 각각 갖는 유니온 `Cat | Dog` 내 상응하는 타입을 찾을겁니다.
+> 바꿔 말하자면, 우리는 `Dog` 타입을 `Lookup<Dog | Cat, 'dog'>`로, `Cat` 타입을 `Lookup<Dog | Cat, 'cat'>`으로 얻어 낼 겁니다.
+
+```ts
+// 예시
+interface Cat {
+    type: 'cat'
+    breeds: 'Abyssinian' | 'Shorthair' | 'Curl' | 'Bengal'
+  }
+  
+  interface Dog {
+    type: 'dog'
+    breeds: 'Hound' | 'Brittany' | 'Bulldog' | 'Boxer'
+    color: 'brown' | 'white' | 'black'
+  }
+  
+  type MyDogType = LookUp<Cat | Dog, 'dog'> // expected to be `Dog`
+```
+
+```ts
+// Union은 string 타입인 type 속성을 갖고, 이 유니온 내에 `type`이라는 키를 갖는 T(동물의 종류)로 필터링
+// U extends { type: 'cat' } 이거나 U extends { type: 'dog' }일 때 해당하는 U(Dog | Cat) 타입을 리턴
+type LookUp<U extends { type: string }, T extends U['type']> = U extends { type: T } ? U : never;
+```
+
+<hr />
+
+### 106. Trim Left
+
+> 주어진 문자열 타입을 받아 왼쪽 빈 칸을 없애는 `TrimLeft<T>`를 구현하세요.
+
+```ts
+// 예시
+type trimed = TrimLeft<'  Hello World  '> // expected to be 'Hello World  '
+```
+
+```ts
+// 첫 번째 방법
+type TrimLeft<S extends string> = 
+  S extends `${infer First}${infer Rest}` 
+  // S를 앞글자와 나머지로 분류
+    ? First extends ' '| '\n' | '\t' 
+    // 만약 앞글자가 ' '(빈칸) '\n'(줄바꿈) '\t'(탭) 이라면
+      ? TrimLeft<Rest> : S // 나머지 값을 재귀적으로 TrimLeft의 제네릭 인자로 넘김
+    : never // 앞글자가 빈칸, 줄바꿈, 탭이 아니라면 리턴하지 않는다 
+
+// 더 간편한 두 번째 방법
+type TrimLeft<S extends string> =  S extends `${' ' | '\n' | '\t'}${infer R}` ? TrimLeft<R> : S
+// 처음부터 First 대신 빈칸, 줄바꿈, 탭을 찾아 나머지를 재귀적으로 호출
+```
+
+- **타입스크립트의 타입 문법 내에서 문자열을 다루는 방법은 유용할 것 같으니 잘 알아두자**
+
+<hr/>
