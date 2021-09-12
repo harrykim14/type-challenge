@@ -330,3 +330,102 @@ type TrimLeft<S extends string> =  S extends `${' ' | '\n' | '\t'}${infer R}` ? 
 - **타입스크립트의 타입 문법 내에서 문자열을 다루는 방법은 유용할 것 같으니 잘 알아두자**
 
 <hr/>
+
+### 108. Trim
+
+> 문자열의 좌우측 빈칸을 없애는 제네릭 `Trim<T>`를 구현하세요.
+
+```ts
+// 예시
+type trimed = Trim<'  Hello World  '> // expected to be 'Hello World'
+```
+
+```ts
+// 타입 정의 없이 사용하면 길어지므로 Left와 Right를 따로 정의 한 후에
+type TrimLeft<S extends string> = S extends `${' ' | '\n' | '\t'}${infer R}` ? TrimLeft<R> : S;
+type TrimRight<S extends string> = S extends  `${infer L}${' ' | '\n' | '\t'}` ? TrimRight<L> : S;
+// TrimRight의 매개변수로 TrimLeft<S>의 결과값을 넘겨주면 된다
+type Trim<S extends string> = TrimRight<TrimLeft<S>>;
+```
+
+<hr />
+
+### 110. Capitalize
+
+> 나머지 문자는 그대로이면서 문자열의 맨 처음 글자만 대문자가 되는 제네릭 `Capitalize<T>`를 구현하세요.
+
+```ts
+// 예시
+type capitalized = Capitalize<'hello world'> // expected to be 'Hello world'
+```
+
+```ts
+type Capitalize<S extends string> = S extends `${infer First}${infer Remains}` ? `${Uppercase<First>}${Remains}` : S;
+// 문자열을 앞뒤로 나누는 것은 앞 문제들로 배웠으니 Uppercase<S> 제네릭이 있다는 것을 알면 금방 풀 수 있는 문제
+```
+
+<hr/>
+
+### 116. Replace
+
+> 주어진 문자열 `S` 내에 있는 `From` 문자열을 `To` 문자열로 대체하는 제네릭 `Replace<S, From, To>`을 구현하세요.
+
+```ts
+// 예시
+type replaced = Replace<'types are fun!', 'fun', 'awesome'> // expected to be 'types are awesome!'
+```
+
+```ts
+type Replace<S extends string, From extends string, To extends string> 
+    = '' extends From // 문자열이 아무것도 없을 때의 예외 처리용 구문
+        ? S 
+        : S extends `${infer Front}${From}${infer Last}` // 문자열 내에 `From`이 있다면 `From`을 중심으로 나누기
+            ? `${Front}${To}${Last}` // `From` 문자열만 `To` 문자열로 변환시켜 리턴
+            : S;
+```
+
+- 예외 처리를 잊지 말 것
+
+<hr/>
+
+### 119. ReplaceAll 
+
+> 주어진 문자열 `S` 내에 있는 모든 `From` 문자열을 `To` 문자열로 바꾸는 제네릭 `ReplaceAll<S, From, To>`를 구현하세요.
+
+```ts
+// 예시
+type replaced = ReplaceAll<'t y p e s', ' ', ''> // expected to be 'types'
+```
+
+```ts
+type ReplaceAll<S extends string, From extends string, To extends string> 
+= From extends '' // 문자열이 아무것도 없을 때의 예외 처리용 구문
+    ? S 
+    : S extends `${infer Front}${From}${infer Last}` // 문자열 내에 `From`이 있다면 `From`을 중심으로 나누기
+        ? `${Front}${To}${ReplaceAll<Last, From, To>}` 
+        // 해당 문자열은 앞에서부터 바꿔나가므로 바뀐 문자열을 제외한 Last 문자열들만 ReplaceAll의 매개변수로 재귀
+        : S;
+```
+
+<hr />
+
+### 191. Append Argument
+
+> 함수 Fn을 첫 번째 인수로, A를 두번째 인수로 사용하고 원래 함수인 Fn의 매개변수로 A가 추가된 오버로드 함수 를 생성하는 제네릭 `AppendArgument<Fn, A>`을 구현하세요.
+
+```ts
+// 예시
+type Fn = (a: number, b: string) => number
+
+type Result = AppendArgument<Fn, boolean> 
+// expected be (a: number, b: string, x: boolean) => number
+```
+
+```ts
+type AppendArgument<Fn, A> 
+    = Fn extends (...arg:[...infer Args]) => infer R 
+        ? (...arg:[...Args, A]) => R // 주어진 함수의 리턴 타입은 동일해야 함
+        : never
+```
+
+<hr />
