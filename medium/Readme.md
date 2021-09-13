@@ -429,3 +429,94 @@ type AppendArgument<Fn, A>
 ```
 
 <hr />
+
+### 296. Permutation 
+
+> 유니온 값으로 받은 타입을 순열로 변환하는 제네릭을 구현하세요.
+
+```ts
+// 예시
+type perm = Permutation<'A' | 'B' | 'C'>; // ['A', 'B', 'C'] | ['A', 'C', 'B'] | ['B', 'A', 'C'] | ['B', 'C', 'A'] | ['C', 'A', 'B'] | ['C', 'B', 'A']
+```
+
+```ts
+type Permutation<T, U = T> 
+    = [U] extends [never] // 두 번째 매개변수가 없다면 빈 배열을 리턴
+        ? [] 
+        : T extends never // 더이상 순회할 수 없을 때란 Exclude로 배열 내에 아무 요소가 없을 때임
+            ? [] 
+            : [T, ...Permutation<Exclude<U, T>>] // T를 배열에 위치시키고 T와 U를 제외한 나머지 요소로 재귀
+```
+
+- 순열 알고리즘에 대한 내용은 [이 페이지](https://minusi.tistory.com/entry/%EC%88%9C%EC%97%B4-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-Permutation-Algorithm)를 참고할 것
+
+<hr/>
+
+### 298. Length of String
+
+> 문자열의 길이를 계산하는 제네릭 `LengthOfString<S>`를 구현하세요.
+
+```ts
+type SplitString<S> 
+  = S extends `${infer First}${infer Remains}` 
+    ? [First, ...SplitString<Remains>] // 재귀적으로 문자열을 분리하여 배열화
+    : [];
+type LengthOfString<S extends string> = SplitString<S>['length']; // 튜플에 정의된 length 값을 리턴
+```
+
+<hr/>
+
+### 459. Flatten 
+
+> 배열 내 모든 요소의 깊이가 같아지도록 하는 제네릭 `Flatten<A>`를 구현하세요.
+
+```ts
+// 예시
+type flatten = Flatten<[1, 2, [3, 4], [[[5]]]]> // [1, 2, 3, 4, 5]
+```
+
+```ts
+type Flatten<T>  
+    = T extends unknown[] 
+        ? T extends [infer A, ...infer R] 
+            ? [...Flatten<A>, ...Flatten<R>] // 재귀적으로 배열 내 모든 요소를 나누어 순환 (Divide)
+            : [] 
+        : [T]; // 단 하나의 요소가 남는다면 해당 요소를 반환 (and Conquer)
+```
+
+<hr/>
+
+### 527. Append to object
+
+> 인터페이스에 새 필드를 추가하는 제네릭을 구현하세요. 이 제네릭은 세 개의 매개변수를 가집니다. 반환값은 반드시 새 필드를 갖는 객체여야 합니다.
+
+```ts
+// 예시
+type Test = { id: '1' }
+type Result = AppendToObject<Test, 'value', 4> // expected to be { id: '1', value: 4 }
+```
+
+```ts
+type merge<T> = {
+    [P in keyof T]: T[P]
+}
+type AppendToObject<T, U extends string, V> = merge<{ [key in U]:V } & T>
+```
+
+<hr/>
+
+### 529. Absolute
+
+> 문자열이나 큰 정수, 정수를 받아 문자열로 된 절대값을 출력하는 제네릭 `Absolute`를 구현하세요.
+
+```ts
+// 예시
+type Test = -100;
+type Result = Absolute<Test>; // expected to be "100"
+```
+
+```ts
+type Absolute<T extends number | string | bigint> = `${T}` extends `-${infer S}` ? `${S}` : `${T}`;
+```
+
+<hr/>
