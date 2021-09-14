@@ -520,3 +520,114 @@ type Absolute<T extends number | string | bigint> = `${T}` extends `-${infer S}`
 ```
 
 <hr/>
+
+### 531. String to Union
+
+> 제네릭 `StringToUnion<S>`를 구현하세요. 매개변수로 문자열을 갖습니다. 출력은 반드시 입력한 문자열의 철자들이어야 합니다.
+
+```ts
+// 예시
+type Test = '123';
+type Result = StringToUnion<Test>; // expected to be "1" | "2" | "3"
+```
+
+```ts
+type StringToUnion<T extends string> 
+    = T extends `${infer First}${infer Remains}` 
+        ? First | StringToUnion<Remains> // 문자열을 나누어 재귀하면서 철자 하나씩 유니온에 추가시킴
+        : never
+```
+
+<hr />
+
+### 599. Merge
+
+> 두 타입을 하나의 새 타입으로 합치세요. 두번째로 주어진 타입의 키는 첫번째로 주어진 타입을 덮어쓸 수 있습니다.
+
+```ts
+// 첫 번째 방법
+type CreateMergedType<T> = {
+    [P in keyof T]: T[P]
+}
+type Merge<F, S> = CreateMergedType<{
+    [P in keyof F as P extends keyof S ? never : P]: F[P]
+    // S 내 키 중에 F 내 키와 같은 키는 반환하지 않는다
+} & S>
+
+// 두 번째 방법
+type Merge<F, S> = {
+    [P in keyof (F & S)] : P extends keyof S // F와 S의 키들을 전부 순회하며 S에 있는 키인지 검사
+    ? S[P] // S의 필드를 먼저 채워넣고
+    : P extends keyof F 
+        ? F[P] // 그 후에 F의 필드를 채워넣음 (공통된 부분은 override 되지 않음)
+        : never 
+};
+```
+
+<hr />
+
+### 610. CamelCase
+
+> KebabCase로 표현된 문자열을 CamelCase로 치환하는 제네릭 `CamelCase<S>`를 구현하세요. 문자열은 `-` 문자로 나누어져 있을 수도 있고, 이 문자로 나누어져있을 경우 해당 문자를 지우고 그 다음에 특수 문자가 아닌 알파벳이 온다면 해당 알파벳을 대문자로 변환하세요.
+
+```ts
+// 예시
+type result = CamelCase<for-bar-baz> // expected 'forBarBaz'
+```
+
+```ts
+// 첫 번째 시도: `Expect<Equal<CamelCase<'foo--bar----baz'>, 'foo-Bar---Baz'>>`를 통과하지 못함
+type Failed_CamelCase<S> 
+    = S extends `${infer Front}-${infer Target}${infer Remains}` // '-' 문자 앞 부분, '-' 문자, '-'의 바로 다음 문자(Target), 나머지로 분리
+        ? Target extends Uppercase<Target> // 타겟 문자가 대문자라면
+            ? `${Front}-${Target}${CamelCase<Remains>}` // 타겟을 그대로 둔 채로 나머지를 매개변수로 하여 CamelCase로 재귀
+            : `${Front}${Uppercase<Target>}${CamelCase<Remains>}` // 대문자가 아니라면 -를 지우고 Uppercase를 적용 후 나머지를 재귀
+        : S;
+
+// 두 번째 시도: Capitalize를 사용하여 해결
+type CamelCase<S>
+    = S extends `${infer Front}${infer Remains}` // 두 부분으로 나누고
+        ? Front extends '-' // 앞 문자가 '-'라면
+            ? Remains extends Capitalize<Remains> // 나머지 부분이 이미 Capitalize된 문자열인지 확인
+                ? `${Front}${CamelCase<Remains>}` // 참이라면 '-'를 없애지 않고 나머지 문자열을 매개변수로 재귀
+                : CamelCase<Capitalize<Remains>> // 거짓이라면 '-'를 제거하고 나머지 문자열로 재귀
+            : `${Front}${CamelCase<Remains>}` // Capitalize되지 않았다면 '-'를 제거하고 나머지 문자열로 재귀
+        : S
+```
+
+<hr />
+
+### 612. KebabCase
+
+> 주어진 문자열을 KebabCase로 치환하는 제네릭 `KebabCase<S>`를 구현하세요. 
+
+```ts
+// 예시
+type result = KebabCase<FooBarBaz> // expected 'for-bar-baz'
+```
+
+```ts
+type KebabCase<S, T extends string = ''> 
+    = S extends `${infer First}${infer Remains}` // 주어진 문자열을 두 부분으로 나누기
+        ? First extends Lowercase<First> // 첫 글자가 소문자라면
+            ? `${First}${KebabCase<Remains, '-'>}` // 그대로 두고 나머지 부분과 앞에 붙일 '-' 문자를 설정
+            : `${T}${Lowercase<First>}${KebabCase<Remains, '-'>}` 
+            // First가 대문자라면 소문자로 바꾸고 앞에 '-'를 붙인다
+        : S
+```
+
+<hr />
+
+### 645. Diff
+
+> `O`와 `O1`의 차집합인 객체를 반환하는 제네릭 `Diff<O, O1>`을 구현하세요.
+
+```ts
+// Pick과 Exclude를 쓰는 방법
+type Diff<O, O1> = Pick<O1 & O, Exclude<keyof O1, keyof O>>
+
+// 이는 Omit으로 줄여 쓸 수 있다
+type Diff<O, O1> = Omit<O & O1, keyof (O | O1) >
+```
+
+<hr />
