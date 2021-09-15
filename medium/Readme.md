@@ -1,5 +1,9 @@
 ## medium 문제 정리 및 풀이
 
+<details>
+<summary>01~10번째 챌린지</summary>
+<div markdown="1-10">
+
 ### 2. Get Return Type
 
 > `ReturnType<T>`를 제네릭을 사용하지 않고 구현해보자.
@@ -303,6 +307,13 @@ type LookUp<U extends { type: string }, T extends U['type']> = U extends { type:
 
 <hr />
 
+</div>
+</details>
+
+<details>
+<summary>11~20번째 챌린지</summary>
+<div markdown="11-20">
+
 ### 106. Trim Left
 
 > 주어진 문자열 타입을 받아 왼쪽 빈 칸을 없애는 `TrimLeft<T>`를 구현하세요.
@@ -505,6 +516,13 @@ type AppendToObject<T, U extends string, V> = merge<{ [key in U]:V } & T>
 
 <hr/>
 
+</div>
+</details>
+
+<details>
+<summary>21~30번째 챌린지</summary>
+<div markdown="21-30">
+
 ### 529. Absolute
 
 > 문자열이나 큰 정수, 정수를 받아 문자열로 된 절대값을 출력하는 제네릭 `Absolute`를 구현하세요.
@@ -623,6 +641,10 @@ type KebabCase<S, T extends string = ''>
 > `O`와 `O1`의 차집합인 객체를 반환하는 제네릭 `Diff<O, O1>`을 구현하세요.
 
 ```ts
+// 예시 없음
+```
+
+```ts
 // Pick과 Exclude를 쓰는 방법
 type Diff<O, O1> = Pick<O1 & O, Exclude<keyof O1, keyof O>>
 
@@ -631,3 +653,166 @@ type Diff<O, O1> = Omit<O & O1, keyof (O | O1) >
 ```
 
 <hr />
+
+### 949. AnyOf
+
+> 파이썬 같은 `any` 함수를 타입 시스템에서 구현하세요. 매개변수로 배열을 받으며 배열 내에 하나라도 `true`값이 있다면 `true`를 리턴합니다. 빈 배열이 주어진다면 `false`를 리턴합니다.
+
+```ts
+// 예시
+type Sample1 = AnyOf<[1, "", false, [], {}]>; // expected to be true.
+type Sample2 = AnyOf<[0, "", false, [], {}]>; // expected to be false.
+```
+
+```ts
+type AnyOf<T extends readonly any[]> 
+    = T[number] extends infer Args | {} // 튜플 T 내에 있는 객체와 요소들을 나눔
+        ? Exclude<Args, 0 | '' | [] | false> extends never // 요소들 중에 0, '', [], false는 never처리
+            ? false 
+            : true
+        : false
+```
+
+- 참고: 파이썬의 any 함수
+
+```python
+def any(iterable): # itarable을 매개변수로 받는 any 함수
+    for element in iterable: # itarable 객체를 돌며
+        if element: # element가 true라면 True를 리턴
+            return True
+    return False # 파이썬의 Falsy 오브젝트는 False, None, 0, 0.0, 0L, Oj, "", [], (), {} 가 있다
+```
+
+
+<hr />
+
+### 1042. IsNever
+
+> `T` 타입을 받는 제네릭 `IsNever<T>`를 구현하세요. 타입이 `never`라면 `true`를, 아니라면 `false`를 출력하세요.
+
+```ts
+// 예시
+type A = IsNever<never>  // expected to be true
+type B = IsNever<undefined> // expected to be false
+type C = IsNever<null> // expected to be false
+type D = IsNever<[]> // expected to be false
+type E = IsNever<number> // expected to be false
+```
+
+```ts
+// type IsNever<T> = T extends never ? true : false; 로 적어서는 안된다
+type IsNever<T> = [T] extends [never] ? true : false; 
+```
+
+<hr />
+
+### 1097. IsUnion 
+
+> 유니온인 타입 `T`를 받았을 때 `true`를 출력하는 제네릭 `IsUnion<T>`를 구현하세요.
+
+```ts
+// 예시
+type case1 = IsUnion<string>  // false
+type case2 = IsUnion<string|number>  // true
+type case3 = IsUnion<[string|number]>  // false
+```
+
+```ts
+// type IsUnion<T> = T extends infer L | infer R ? true : false;
+type IsUnion<T, K = T> 
+    = T extends K 
+        ? [K] extends [T] 
+            ? false 
+            : true 
+        : never;
+```
+
+<hr />
+
+### 1130. ReplaceKeys
+
+> 세 개의 매개변수를 받아 유니온 타입 내의 키들을 바꾸는 제네릭 `ReplaceKeys<U, T, Y>`를 구현하세요.
+> 만약 타입에 `Y`로 설정하고자 하는 키가 없다면 건너뛰세요.
+
+```ts
+// 예시
+type NodeA = {
+  type: 'A'
+  name: string
+  flag: number
+}
+
+type NodeB = {
+  type: 'B'
+  id: number
+  flag: number
+}
+
+type NodeC = {
+  type: 'C'
+  name: string
+  flag: number
+}
+
+
+type Nodes = NodeA | NodeB | NodeC
+
+type ReplacedNodes = ReplaceKeys<Nodes, 'name' | 'flag', {name: number, flag: string}> 
+// {type: 'A', name: number, flag: string} | {type: 'B', id: number, flag: string} | {type: 'C', name: number, flag: string} 
+// would replace name from string to number, replace flag from number to string.
+
+type ReplacedNotExistKeys = ReplaceKeys<Nodes, 'name', {aa: number}> 
+// {type: 'A', name: never, flag: number} | NodeB | {type: 'C', name: never, flag: number} 
+// would replace name to never
+```
+
+```ts
+type ReplaceKeys<U, T, Y> = {
+    [P in keyof U] : P extends T // U의 키들이 T에 존재한다면
+        ? P extends keyof Y  // 또한 Y의 키가 P(U의 키들)에 있다면
+            ? Y[P] // Y[P]로 키를 설정
+            : never // 아니라면 never
+        : U[P]; // Y의 키가 없다면 U의 키로 유지
+}
+```
+
+<hr />
+
+</div>
+</details>
+
+<details>
+<summary>31~40번째 챌린지</summary>
+<div markdown="31-40">
+
+### 1367. Remove Index Signature
+
+> 객체 타입들에서 숫자나 문자열의 키로 접근 가능한 인덱스 시그니처(index signature)를 삭제하는 제네릭 `RemoveIndexSignature<T>`를 구현하세요
+
+```ts
+// 예시
+type Foo = {
+  [key: string]: any;
+  foo(): void;
+}
+
+type A = RemoveIndexSignature<Foo>  // expected { foo(): void }
+```
+
+```ts
+// 첫 번째 시도: P가 string이거나 number라면 never를 반환하도록 하였으나 실패
+// type RemoveIndexSignature<T> = {
+//     [P in keyof T] : P extends [string | number] ? never : T[P];
+// }
+type RemoveIndexSignature<T> = {
+    [P in keyof T as string extends P ? never : number extends P ? never : P]: T[P];
+    // 타입을 구성하는 삼항연산자에서는 유니온 타입으로 extends 키워드를 사용할 수 없다
+}
+```
+
+- 인덱스 시그니처에 관한 내용은 [이 페이지](https://heropy.blog/2020/01/27/typescript/)와 [이 페이지](https://radlohead.gitbook.io/typescript-deep-dive/type-system/index-signatures)에서 확인할 수 있다.
+
+<hr />
+
+</div>
+</details>
