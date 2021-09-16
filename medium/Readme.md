@@ -814,5 +814,186 @@ type RemoveIndexSignature<T> = {
 
 <hr />
 
+### 1978. Percentage Parser
+
+> 제네릭 `Percentage Parser<T>`를 구현하세요. 정규표현식 `/^(\+|\-)?(\d*)?(\%)?$/`에 따라 `T`를 세 파트로 나누세요. 구조는 반드시 [`plus or miuns`, `number`, `unit` ] 이 되어야 합니다. 해당하지 않는다면 빈 문자열로 남겨두세요.
+
+```ts
+// 예시
+type PString1 = ''
+type PString2 = '+85%'
+type PString3 = '-85%'
+type PString4 = '85%'
+type PString5 = '85'
+
+type R1 = PercentageParser<PString1>  // expected ['', '', '']
+type R2 = PercentageParser<PString2>  // expected ["+", "85", "%"]
+type R3 = PercentageParser<PString3>  // expected ["-", "85", "%"]
+type R4 = PercentageParser<PString4>  // expected ["", "85", "%"]
+type R5 = PercentageParser<PString5>  // expected ["", "85", ""]
+```
+
+```ts
+type Sign = '+' | '-';
+type Unit = '%'
+
+type PercentageParser<A extends string> 
+    = A extends `${Sign}${infer Remains}` // 주어진 문자열 A내에 Sign이 있는지부터 확인
+        ? A extends `${infer Sign}${infer Nums}${Unit}` // Remains 내에 '%' 문자가 있는지 확인
+            ? [Sign, Nums, Unit] // 있다면 세 부분으로 나누기
+            : A extends `${infer Sign}${infer Nums}` // 없다면 Remains가 전부 숫자이므로 
+                ? [Sign, Nums, ''] // Unit 부분을 빈 문자열로 리턴
+                : A extends `${Sign}` // Sign만 있다면 
+                    ? [Sign, '', ''] // Sign만 포함된 배열을 리턴해야하며
+                    : ['', '', ''] // 아무것도 없는 빈 배열이라면 빈 문자열만 포함된 해당 배열을 리턴
+        : A extends `${infer Nums}${Unit}` // Sign이 없지만 Unit은 포함하는 문자열이라면
+            ? ['', Nums, Unit] 
+            : ['', A, ''];
+```
+
+<hr />
+
+### 2070. Drop Char
+
+> 문자열에서 주어진 문자를 없애는 제네릭 `DropChar<S, C>`를 구현하세요.
+
+```ts
+// 예시
+type Butterfly = DropChar<' b u t t e r f l y ! ', ' '> // 'butterfly!'
+```
+
+```ts
+type DropChar<S, C extends string> 
+    = S extends `${infer Front}${C}${infer Remains}`
+        ? DropChar<`${Front}${Remains}`, C>
+        : S
+```
+
+<hr />
+
+### 2257. MinusOne (미해결)
+
+> (반드시 양수인) 숫자가 타입으로 주어질 때 1을 빼는 제네릭 `MinusOne<N>`을 구현하세요.
+
+```ts
+// 예시
+type Zero = MinusOne<1> // 0
+type FiftyFour = MinusOne<55> // 54
+```
+
+```ts
+```
+
+<hr />
+
+### 2595. PickByType
+
+> `T`에서 `U`에 해당하는 타입 셋만 가지는 제네릭 `PickByType<T, U>`를 구현하세요.
+
+```ts
+// 예시
+type OnlyBoolean = PickByType<{
+  name: string
+  count: number
+  isReadonly: boolean
+  isEnable: boolean
+}, boolean> // { isReadonly: boolean; isEnable: boolean; }
+```
+
+```ts
+type PickByType<T, U> = {
+    [P in keyof T as T[P] extends U ? P : never]: T[P];
+}
+```
+
+<hr />
+
+### 2688. StartsWith
+
+> 주어진 문자열 `T`가 정확하게 `U`로 시작하는지 확인하는 제네릭 `StartsWith<T, U>`를 구현하세요.
+
+```ts
+type a = StartsWith<'abc', 'ac'> // expected to be false
+type b = StartsWith<'abc', 'ab'> // expected to be true
+type c = StartsWith<'abc', 'abcd'> // expected to be false
+```
+
+```ts
+type StartsWith<T extends string, U extends string> = T extends `${U}${infer remains}` ? true : false;
+```
+
+### 2693. EndsWith
+
+>주어진 문자열 `T`가 정확하게 `U`로 끝나는지 확인하는 제네릭 `EndsWith<T, U>`를 구현하세요.
+
+```ts
+type EndsWith<T extends string, U extends string> = T extends `${infer Front}${U}` ? true : false;
+```
+
+### 2757. PartialByKeys 
+
+> 매개변수로 두 타입 `T`와 `K`를 받는 제네릭 `PartialByKeys<T, K>`를 구현하세요. `K`는 타입 `T` 내의 요소이며 반드시 옵셔널로 설정되어야 합니다. `K`가 주어지지 않는다면 제네릭 `Partial<T>`처럼 모든 필드가 옵셔널로 설정되어야 합니다.
+
+```ts
+// 예시
+interface User {
+  name: string
+  age: number
+  address: string
+}
+
+type UserPartialName = PartialByKeys<User, 'name'> // { name?:string; age:number; address:string }
+```
+
+```ts
+// type result = PartialByKeys<User, 'name'>
+// type result = {
+//     name?: string;
+// } & {
+//     age: number;
+//     address: string;
+// }
+// 이렇게 타입이 추론되기 때문에 이 &로 떨어진 타입을 하나로 묶어줄 필요가 있다
+
+type CombineTypes<T> = {
+    [P in keyof T] : T[P]
+}
+
+type PartialByKeys<T, K = keyof T> = CombineTypes<{ // K에 값이 없다면 모든 키 값을 옵셔널 처리 해야 한다
+    [P in keyof T as P extends K ? P : never]?: T[P] // K 값과 동일한 필드를 옵셔널처리
+} & {
+    [P in keyof T as P extends K ? never: P] : T[P] // K값과 다른 필드를 그대로 두기
+}>
+```
+
+<hr />
+
+### 2759. RequiredByKeys 
+
+> 매개변수로 두 타입 `T`와 `K`를 받는 제네릭 `RequiredByKeys<T, K>`을 구현하세요. `K`는 타입 `T` 내의 요소이며 반드시 필요한 값으로 설정되어야 합니다. `K`가 주어지지 않는다면 제네릭 `Require<T>`처럼 모든 필드가 반드시 필요한 값으로 설정되어야 합니다.
+
+```ts
+// 예시
+interface User {
+  name?: string
+  age?: number
+  address?: string
+}
+
+type UserPartialName = RequiredByKeys<User, 'name'> // { name: string; age?: number; address?: string }
+```
+
+```ts
+type CombineType<T> = {
+    [P in keyof T] : T[P]
+}
+
+type RequiredByKeys<T, K = keyof T> = CombineType<{
+    [P in keyof T as P extends K ? P : never] -?: T[P] // 옵셔널 타입을 제거할 때엔 -?를 사용한다
+} & {
+    [P in keyof T as P extends K ? never: P] : T[P]
+}>
+```
+
 </div>
 </details>
