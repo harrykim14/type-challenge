@@ -1,7 +1,7 @@
 ## 難度ミディアムの解答整理など
 
 <details>
-<summary>01~10目のチャレンジ</summary>
+<summary>01~10番目のチャレンジ</summary>
 <div markdown="1-10">
 
 ### 2. Get Return Type
@@ -312,51 +312,51 @@ type LookUp<U extends { type: string }, T extends U['type']> = U extends { type:
 </details>
 
 <details>
-<summary>11~20번째 챌린지</summary>
+<summary>11~20番目のチャレンジ</summary>
 <div markdown="11-20">
 
 ### 106. Trim Left
 
-> 주어진 문자열 타입을 받아 왼쪽 빈 칸을 없애는 `TrimLeft<T>`를 구현하세요.
+> 与えられた文字列タイプを受け、左側の空欄を消す`TrimLeft<T>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type trimed = TrimLeft<'  Hello World  '> // expected to be 'Hello World  '
 ```
 
 ```ts
-// 첫 번째 방법
+// 一つ目の方法
 type TrimLeft<S extends string> = 
   S extends `${infer First}${infer Rest}` 
-  // S를 앞글자와 나머지로 분류
+  // Sを頭文字と残りで分ける
     ? First extends ' '| '\n' | '\t' 
-    // 만약 앞글자가 ' '(빈칸) '\n'(줄바꿈) '\t'(탭) 이라면
-      ? TrimLeft<Rest> : S // 나머지 값을 재귀적으로 TrimLeft의 제네릭 인자로 넘김
-    : never // 앞글자가 빈칸, 줄바꿈, 탭이 아니라면 리턴하지 않는다 
+    // もし頭文字が' '(空欄)、'\n'(改行)、'\t'(タブ)なら
+      ? TrimLeft<Rest> : S // 残りの文字をTrimLeftのパラメータとして使って再帰
+    : never // 頭文字が空欄、改行、タブではない場合無視
 
-// 더 간편한 두 번째 방법
+// もっと便利な二つ目の方法
 type TrimLeft<S extends string> =  S extends `${' ' | '\n' | '\t'}${infer R}` ? TrimLeft<R> : S
-// 처음부터 First 대신 빈칸, 줄바꿈, 탭을 찾아 나머지를 재귀적으로 호출
+// 最初からFirstの代わりに空欄と改行、タブを探して当て、残りで再帰
 ```
 
-- **타입스크립트의 타입 문법 내에서 문자열을 다루는 방법은 유용할 것 같으니 잘 알아두자**
+- **Typescriptの文法内で文字列を扱う方法は使えそうなので(有効性の検証や正規表現など)覚えておこう**
 
 <hr/>
 
 ### 108. Trim
 
-> 문자열의 좌우측 빈칸을 없애는 제네릭 `Trim<T>`를 구현하세요.
+> 文字列の左右をなくすジェネリック`Trim<T>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type trimed = Trim<'  Hello World  '> // expected to be 'Hello World'
 ```
 
 ```ts
-// 타입 정의 없이 사용하면 길어지므로 Left와 Right를 따로 정의 한 후에
+// タイプ正義なしで使用すると長くなってコードが分かりにくいのでLeftとRightを別々に定義し
 type TrimLeft<S extends string> = S extends `${' ' | '\n' | '\t'}${infer R}` ? TrimLeft<R> : S;
 type TrimRight<S extends string> = S extends  `${infer L}${' ' | '\n' | '\t'}` ? TrimRight<L> : S;
-// TrimRight의 매개변수로 TrimLeft<S>의 결과값을 넘겨주면 된다
+// TrimRightのパラメータとしてTrimLeft<S>のタイプ推論値を使う
 type Trim<S extends string> = TrimRight<TrimLeft<S>>;
 ```
 
@@ -364,58 +364,59 @@ type Trim<S extends string> = TrimRight<TrimLeft<S>>;
 
 ### 110. Capitalize
 
-> 나머지 문자는 그대로이면서 문자열의 맨 처음 글자만 대문자가 되는 제네릭 `Capitalize<T>`를 구현하세요.
+> 残りの文字はそのままで、頭文字だけ大文字になるジェネリック`Capitalize<T>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type capitalized = Capitalize<'hello world'> // expected to be 'Hello world'
 ```
 
 ```ts
 type Capitalize<S extends string> = S extends `${infer First}${infer Remains}` ? `${Uppercase<First>}${Remains}` : S;
-// 문자열을 앞뒤로 나누는 것은 앞 문제들로 배웠으니 Uppercase<S> 제네릭이 있다는 것을 알면 금방 풀 수 있는 문제
+// Typescriptの内装ジェネリック`Uppercase<S>`を使うと残りは前に習った文字の分解式
 ```
 
 <hr/>
 
 ### 116. Replace
 
-> 주어진 문자열 `S` 내에 있는 `From` 문자열을 `To` 문자열로 대체하는 제네릭 `Replace<S, From, To>`을 구현하세요.
+> 与えられた文字列`S`内にある`From`文字列を`To`文字列に変えるジェネリック`Replace<S, From, To>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type replaced = Replace<'types are fun!', 'fun', 'awesome'> // expected to be 'types are awesome!'
 ```
 
 ```ts
 type Replace<S extends string, From extends string, To extends string> 
-    = '' extends From // 문자열이 아무것도 없을 때의 예외 처리용 구문
+    = '' extends From // 文字列になんもない場合の例外処理分
         ? S 
-        : S extends `${infer Front}${From}${infer Last}` // 문자열 내에 `From`이 있다면 `From`을 중심으로 나누기
-            ? `${Front}${To}${Last}` // `From` 문자열만 `To` 문자열로 변환시켜 리턴
+        : S extends `${infer Front}${From}${infer Last}` 
+        // 文字列の中に`From`があれば`From`を中心として文字列を分ける
+            ? `${Front}${To}${Last}` // `From`文字列の部分に`To`文字列を代入してリターン
             : S;
 ```
 
-- 예외 처리를 잊지 말 것
+- 例外処理はいつも大事。
 
 <hr/>
 
 ### 119. ReplaceAll 
 
-> 주어진 문자열 `S` 내에 있는 모든 `From` 문자열을 `To` 문자열로 바꾸는 제네릭 `ReplaceAll<S, From, To>`를 구현하세요.
+> 与えられた文字列`S`の中にある全ての`From`文字列を`To`文字列に変えるジェネリック`ReplaceAll<S, From, To>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type replaced = ReplaceAll<'t y p e s', ' ', ''> // expected to be 'types'
 ```
 
 ```ts
 type ReplaceAll<S extends string, From extends string, To extends string> 
-= From extends '' // 문자열이 아무것도 없을 때의 예외 처리용 구문
+= From extends '' // 例外処理文
     ? S 
-    : S extends `${infer Front}${From}${infer Last}` // 문자열 내에 `From`이 있다면 `From`을 중심으로 나누기
+    : S extends `${infer Front}${From}${infer Last}` // ここまで前の問題と同じ方法
         ? `${Front}${To}${ReplaceAll<Last, From, To>}` 
-        // 해당 문자열은 앞에서부터 바꿔나가므로 바뀐 문자열을 제외한 Last 문자열들만 ReplaceAll의 매개변수로 재귀
+        // 当たりの文字列は前から変えていくので変えた後の残りの文字列をReplaceAllのパラメータとして使う
         : S;
 ```
 
@@ -423,10 +424,10 @@ type ReplaceAll<S extends string, From extends string, To extends string>
 
 ### 191. Append Argument
 
-> 함수 Fn을 첫 번째 인수로, A를 두번째 인수로 사용하고 원래 함수인 Fn의 매개변수로 A가 추가된 오버로드 함수 를 생성하는 제네릭 `AppendArgument<Fn, A>`을 구현하세요.
+> 関数Fnを最初のパラメータに、Aを二番目のパラメータとして使用し、もともと関数であるFnのパラメータにAが加われたオーバーロード関数を生成するジェネリック`AppendArgument<Fn, A>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type Fn = (a: number, b: string) => number
 
 type Result = AppendArgument<Fn, boolean> 
@@ -435,8 +436,8 @@ type Result = AppendArgument<Fn, boolean>
 
 ```ts
 type AppendArgument<Fn, A> 
-    = Fn extends (...arg:[...infer Args]) => infer R 
-        ? (...arg:[...Args, A]) => R // 주어진 함수의 리턴 타입은 동일해야 함
+    = Fn extends (...arg:[...infer Args]) => infer R // 関数のパラメータを配列化してConcatみたいにAを追加
+        ? (...arg:[...Args, A]) => R // 与えられた関数のリターンタイプは同じである
         : never
 ```
 
@@ -444,46 +445,50 @@ type AppendArgument<Fn, A>
 
 ### 296. Permutation 
 
-> 유니온 값으로 받은 타입을 순열로 변환하는 제네릭을 구현하세요.
+> ユニオンで受けたタイプを順列で返還するジェネリック`Permutation<U>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type perm = Permutation<'A' | 'B' | 'C'>; // ['A', 'B', 'C'] | ['A', 'C', 'B'] | ['B', 'A', 'C'] | ['B', 'C', 'A'] | ['C', 'A', 'B'] | ['C', 'B', 'A']
 ```
 
 ```ts
 type Permutation<T, U = T> 
-    = [U] extends [never] // 두 번째 매개변수가 없다면 빈 배열을 리턴
+    = [U] extends [never] // 二番目のパラメータがない場合空の配列をリターン
         ? [] 
-        : T extends never // 더이상 순회할 수 없을 때란 Exclude로 배열 내에 아무 요소가 없을 때임
+        : T extends never // `もう巡回できない場合`とはExcludeで配列に何も存在しない時
             ? [] 
-            : [T, ...Permutation<Exclude<U, T>>] // T를 배열에 위치시키고 T와 U를 제외한 나머지 요소로 재귀
+            : [T, ...Permutation<Exclude<U, T>>] // Tを配列に位置させてTとUを除いた残りで再帰
 ```
 
-- 순열 알고리즘에 대한 내용은 [이 페이지](https://minusi.tistory.com/entry/%EC%88%9C%EC%97%B4-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-Permutation-Algorithm)를 참고할 것
+- 順列アルゴリズムに関する内容は[このページ](https://minusi.tistory.com/entry/%EC%88%9C%EC%97%B4-%EC%95%8C%EA%B3%A0%EB%A6%AC%EC%A6%98-Permutation-Algorithm)を参照しました。(韓国語ページ)
 
 <hr/>
 
 ### 298. Length of String
 
-> 문자열의 길이를 계산하는 제네릭 `LengthOfString<S>`를 구현하세요.
+> 文字列の長さを計算するジェネリック`LengthOfString<S>`を具現してみよう。
+
+```ts
+// 例文なし
+```
 
 ```ts
 type SplitString<S> 
   = S extends `${infer First}${infer Remains}` 
-    ? [First, ...SplitString<Remains>] // 재귀적으로 문자열을 분리하여 배열화
+    ? [First, ...SplitString<Remains>] // 再帰を使って文字列を一文字ずつ分けて配列化
     : [];
-type LengthOfString<S extends string> = SplitString<S>['length']; // 튜플에 정의된 length 값을 리턴
+type LengthOfString<S extends string> = SplitString<S>['length']; //　タプルに定義し、タプル内部のlength値を参照
 ```
 
 <hr/>
 
 ### 459. Flatten 
 
-> 배열 내 모든 요소의 깊이가 같아지도록 하는 제네릭 `Flatten<A>`를 구현하세요.
+> 配列の中の全ての要素の深さ(Depth)が同じになるジェネリック`Flatten<A>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type flatten = Flatten<[1, 2, [3, 4], [[[5]]]]> // [1, 2, 3, 4, 5]
 ```
 
@@ -491,19 +496,19 @@ type flatten = Flatten<[1, 2, [3, 4], [[[5]]]]> // [1, 2, 3, 4, 5]
 type Flatten<T>  
     = T extends unknown[] 
         ? T extends [infer A, ...infer R] 
-            ? [...Flatten<A>, ...Flatten<R>] // 재귀적으로 배열 내 모든 요소를 나누어 순환 (Divide)
+            ? [...Flatten<A>, ...Flatten<R>] // 再帰と再帰した結果をスプレッド構文で分ける(Divide)
             : [] 
-        : [T]; // 단 하나의 요소가 남는다면 해당 요소를 반환 (and Conquer)
+        : [T]; // 再帰ができない場合は配列にただ一つだけ残っている場合なのでそのままリターン(and Conquer)
 ```
 
 <hr/>
 
 ### 527. Append to object
 
-> 인터페이스에 새 필드를 추가하는 제네릭을 구현하세요. 이 제네릭은 세 개의 매개변수를 가집니다. 반환값은 반드시 새 필드를 갖는 객체여야 합니다.
+> インターフェースに新しいフィールドを追加するジェネリックを具現してみよう。このジェネリックは三つのパラメータを持ちます。リターン値は必ず新しいフィールドを持つオブジェクトです。
 
 ```ts
-// 예시
+// 例
 type Test = { id: '1' }
 type Result = AppendToObject<Test, 'value', 4> // expected to be { id: '1', value: 4 }
 ```
@@ -513,6 +518,7 @@ type merge<T> = {
     [P in keyof T]: T[P]
 }
 type AppendToObject<T, U extends string, V> = merge<{ [key in U]:V } & T>
+// Uで与えられたキーでVの値を持つタイプを生成し、元のタイプTを＆演算子で結び、mergeジェネリックで一つのタイプにまとめる
 ```
 
 <hr/>
