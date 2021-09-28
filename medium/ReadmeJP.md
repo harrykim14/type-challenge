@@ -527,31 +527,32 @@ type AppendToObject<T, U extends string, V> = merge<{ [key in U]:V } & T>
 </details>
 
 <details>
-<summary>21~30번째 챌린지</summary>
+<summary>21~30番目のチャレンジ</summary>
 <div markdown="21-30">
 
 ### 529. Absolute
 
-> 문자열이나 큰 정수, 정수를 받아 문자열로 된 절대값을 출력하는 제네릭 `Absolute`를 구현하세요.
+> 文字列か大きい整数、整数を受け、文字列の絶対値を出力するジェネリック`Absolute`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type Test = -100;
 type Result = Absolute<Test>; // expected to be "100"
 ```
 
 ```ts
 type Absolute<T extends number | string | bigint> = `${T}` extends `-${infer S}` ? `${S}` : `${T}`;
+// バッククォートを使って文字列に
 ```
 
 <hr/>
 
 ### 531. String to Union
 
-> 제네릭 `StringToUnion<S>`를 구현하세요. 매개변수로 문자열을 갖습니다. 출력은 반드시 입력한 문자열의 철자들이어야 합니다.
+> ジェネリック`StringToUnion<S>`を具現してみよう。パラメータで文字列をもらいます。出力は必ず入力した文字列のスペルです。
 
 ```ts
-// 예시
+// 例
 type Test = '123';
 type Result = StringToUnion<Test>; // expected to be "1" | "2" | "3"
 ```
@@ -559,7 +560,7 @@ type Result = StringToUnion<Test>; // expected to be "1" | "2" | "3"
 ```ts
 type StringToUnion<T extends string> 
     = T extends `${infer First}${infer Remains}` 
-        ? First | StringToUnion<Remains> // 문자열을 나누어 재귀하면서 철자 하나씩 유니온에 추가시킴
+        ? First | StringToUnion<Remains> // 文字列を分けて再帰しながらスペル一つ一つをユニオンに追加する
         : never
 ```
 
@@ -567,24 +568,24 @@ type StringToUnion<T extends string>
 
 ### 599. Merge
 
-> 두 타입을 하나의 새 타입으로 합치세요. 두번째로 주어진 타입의 키는 첫번째로 주어진 타입을 덮어쓸 수 있습니다.
+> 二つのタイプを一つのタイプにしましょう。二番目に与えられたタイプのキーは一番目のタイプを上書きできます。
 
 ```ts
-// 첫 번째 방법
+// 一つ目の方法
 type CreateMergedType<T> = {
     [P in keyof T]: T[P]
 }
 type Merge<F, S> = CreateMergedType<{
     [P in keyof F as P extends keyof S ? never : P]: F[P]
-    // S 내 키 중에 F 내 키와 같은 키는 반환하지 않는다
+    // S内のキーの中でF内のキーと同じキーは返還しない
 } & S>
 
-// 두 번째 방법
+// 二つ目の方法
 type Merge<F, S> = {
-    [P in keyof (F & S)] : P extends keyof S // F와 S의 키들을 전부 순회하며 S에 있는 키인지 검사
-    ? S[P] // S의 필드를 먼저 채워넣고
+    [P in keyof (F & S)] : P extends keyof S // FとSのキーを全部回りながらSにあるキーか検証
+    ? S[P] // Sのフィールドを最初に入れて
     : P extends keyof F 
-        ? F[P] // 그 후에 F의 필드를 채워넣음 (공통된 부분은 override 되지 않음)
+        ? F[P] // そのあとでFのフィールドを入れる事で共通する部分はoverrideしないようにする
         : never 
 };
 ```
@@ -593,30 +594,30 @@ type Merge<F, S> = {
 
 ### 610. CamelCase
 
-> KebabCase로 표현된 문자열을 CamelCase로 치환하는 제네릭 `CamelCase<S>`를 구현하세요. 문자열은 `-` 문자로 나누어져 있을 수도 있고, 이 문자로 나누어져있을 경우 해당 문자를 지우고 그 다음에 특수 문자가 아닌 알파벳이 온다면 해당 알파벳을 대문자로 변환하세요.
+> KebabCaseで表現した文字列をCamelCaseに変えるジェネリック`CamelCase<S>`を具現してみよう。文字列は`-`で分けているかもしれないし、もし`-`で分けられている場合はこの文字を消して、その次に特殊文字でないアルファベットが来たら大文字に変えましょう。
 
 ```ts
-// 예시
+// 例
 type result = CamelCase<for-bar-baz> // expected 'forBarBaz'
 ```
 
 ```ts
-// 첫 번째 시도: `Expect<Equal<CamelCase<'foo--bar----baz'>, 'foo-Bar---Baz'>>`를 통과하지 못함
+// 一回目のトライ: テスト`Expect<Equal<CamelCase<'foo--bar----baz'>, 'foo-Bar---Baz'>>`でエラー
 type Failed_CamelCase<S> 
-    = S extends `${infer Front}-${infer Target}${infer Remains}` // '-' 문자 앞 부분, '-' 문자, '-'의 바로 다음 문자(Target), 나머지로 분리
-        ? Target extends Uppercase<Target> // 타겟 문자가 대문자라면
-            ? `${Front}-${Target}${CamelCase<Remains>}` // 타겟을 그대로 둔 채로 나머지를 매개변수로 하여 CamelCase로 재귀
-            : `${Front}${Uppercase<Target>}${CamelCase<Remains>}` // 대문자가 아니라면 -를 지우고 Uppercase를 적용 후 나머지를 재귀
+    = S extends `${infer Front}-${infer Target}${infer Remains}` // '-'文字の前の部分、'-', '-'の次の文字(Target)、残りで分ける
+        ? Target extends Uppercase<Target> // ターゲット文字が大文字なら
+            ? `${Front}-${Target}${CamelCase<Remains>}` // ターゲットをそのままにして残りで再帰
+            : `${Front}${Uppercase<Target>}${CamelCase<Remains>}` // 大文字でないと`-`を消してUppercaseでターゲットを大文字化する
         : S;
 
-// 두 번째 시도: Capitalize를 사용하여 해결
+// 二回目のトライ: Capitalizeを使用して解決
 type CamelCase<S>
-    = S extends `${infer Front}${infer Remains}` // 두 부분으로 나누고
-        ? Front extends '-' // 앞 문자가 '-'라면
-            ? Remains extends Capitalize<Remains> // 나머지 부분이 이미 Capitalize된 문자열인지 확인
-                ? `${Front}${CamelCase<Remains>}` // 참이라면 '-'를 없애지 않고 나머지 문자열을 매개변수로 재귀
-                : CamelCase<Capitalize<Remains>> // 거짓이라면 '-'를 제거하고 나머지 문자열로 재귀
-            : `${Front}${CamelCase<Remains>}` // Capitalize되지 않았다면 '-'를 제거하고 나머지 문자열로 재귀
+    = S extends `${infer Front}${infer Remains}` // 二つに分けて
+        ? Front extends '-' // Frontが'-'なら
+            ? Remains extends Capitalize<Remains> // 残りがCapitalizeされた文字列か検証
+                ? `${Front}${CamelCase<Remains>}` // Trueなら'-'を消さずに残りの文字列で再帰
+                : CamelCase<Capitalize<Remains>> // Falseなら'-'を消し、残りで再帰
+            : `${Front}${CamelCase<Remains>}` // Capitalizeされなかったら'-'を消して残りの文字列で再帰
         : S
 ```
 
@@ -624,20 +625,20 @@ type CamelCase<S>
 
 ### 612. KebabCase
 
-> 주어진 문자열을 KebabCase로 치환하는 제네릭 `KebabCase<S>`를 구현하세요. 
+> 与えられた文字列をKebabCaseに変えるジェネリック`KebabCase<S>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type result = KebabCase<FooBarBaz> // expected 'for-bar-baz'
 ```
 
 ```ts
 type KebabCase<S, T extends string = ''> 
-    = S extends `${infer First}${infer Remains}` // 주어진 문자열을 두 부분으로 나누기
-        ? First extends Lowercase<First> // 첫 글자가 소문자라면
-            ? `${First}${KebabCase<Remains, '-'>}` // 그대로 두고 나머지 부분과 앞에 붙일 '-' 문자를 설정
+    = S extends `${infer First}${infer Remains}` // 与えられた文字列を二つに分ける
+        ? First extends Lowercase<First> // 最前の文字が小文字だったら
+            ? `${First}${KebabCase<Remains, '-'>}` // そのまま置いといて残りと前につける'-'文字をパラメータで再帰
             : `${T}${Lowercase<First>}${KebabCase<Remains, '-'>}` 
-            // First가 대문자라면 소문자로 바꾸고 앞에 '-'를 붙인다
+            // Firstが大文字なら小文字に変えて前に'-'を付ける
         : S
 ```
 
@@ -645,17 +646,17 @@ type KebabCase<S, T extends string = ''>
 
 ### 645. Diff
 
-> `O`와 `O1`의 차집합인 객체를 반환하는 제네릭 `Diff<O, O1>`을 구현하세요.
+> `O`と`O1`の差集合オブジェクトを返還するジェネリック`Diff<O, O1>`を具現してみよう。
 
 ```ts
-// 예시 없음
+// 例文なし
 ```
 
 ```ts
-// Pick과 Exclude를 쓰는 방법
+// PickとExcludeを使う方法
 type Diff<O, O1> = Pick<O1 & O, Exclude<keyof O1, keyof O>>
 
-// 이는 Omit으로 줄여 쓸 수 있다
+// 上の文はOmitで略せる
 type Diff<O, O1> = Omit<O & O1, keyof (O | O1) >
 ```
 
@@ -663,31 +664,31 @@ type Diff<O, O1> = Omit<O & O1, keyof (O | O1) >
 
 ### 949. AnyOf
 
-> 파이썬 같은 `any` 함수를 타입 시스템에서 구현하세요. 매개변수로 배열을 받으며 배열 내에 하나라도 `true`값이 있다면 `true`를 리턴합니다. 빈 배열이 주어진다면 `false`를 리턴합니다.
+> Pythonの関数`any`をタイプシステムで具現してみよう。パラメータで配列を受け、配列の中に一つでも`true`値があれば`true`をリターンします。空の配列が与えられると`false`をリターンします。
 
 ```ts
-// 예시
+// 例
 type Sample1 = AnyOf<[1, "", false, [], {}]>; // expected to be true.
 type Sample2 = AnyOf<[0, "", false, [], {}]>; // expected to be false.
 ```
 
 ```ts
 type AnyOf<T extends readonly any[]> 
-    = T[number] extends infer Args | {} // 튜플 T 내에 있는 객체와 요소들을 나눔
-        ? Exclude<Args, 0 | '' | [] | false> extends never // 요소들 중에 0, '', [], false는 never처리
+    = T[number] extends infer Args | {} // タプルTの中の要素をオブジェクトとパラメータで分ける
+        ? Exclude<Args, 0 | '' | [] | false> extends never // 要素の中に0、''、[]、falseは無視(never)
             ? false 
             : true
         : false
 ```
 
-- 참고: 파이썬의 any 함수
+- 参照: Pythonのany関数
 
 ```python
-def any(iterable): # itarable을 매개변수로 받는 any 함수
-    for element in iterable: # itarable 객체를 돌며
-        if element: # element가 true라면 True를 리턴
+def any(iterable): # itarableをパラメータとして受けるany関数
+    for element in iterable: # itarableのオブジェクトを回りながら
+        if element: # elementがtrueならTrueをリターン
             return True
-    return False # 파이썬의 Falsy 오브젝트는 False, None, 0, 0.0, 0L, Oj, "", [], (), {} 가 있다
+    return False # PythonのFalsyはFalse、None、0、0.0、0L、Oj、""、[]、()、{}がある
 ```
 
 
@@ -695,10 +696,10 @@ def any(iterable): # itarable을 매개변수로 받는 any 함수
 
 ### 1042. IsNever
 
-> `T` 타입을 받는 제네릭 `IsNever<T>`를 구현하세요. 타입이 `never`라면 `true`를, 아니라면 `false`를 출력하세요.
+> `T`タイプを受けるジェネリック`IsNever<T>`を具現してみよう。タイプが`never`なら`true`を、違う場合は`false`を出力しよう。
 
 ```ts
-// 예시
+// 例
 type A = IsNever<never>  // expected to be true
 type B = IsNever<undefined> // expected to be false
 type C = IsNever<null> // expected to be false
@@ -707,7 +708,7 @@ type E = IsNever<number> // expected to be false
 ```
 
 ```ts
-// type IsNever<T> = T extends never ? true : false; 로 적어서는 안된다
+// type IsNever<T> = T extends never ? true : false; で書いたら全部neverに処理されるので[]処理
 type IsNever<T> = [T] extends [never] ? true : false; 
 ```
 
@@ -715,10 +716,10 @@ type IsNever<T> = [T] extends [never] ? true : false;
 
 ### 1097. IsUnion 
 
-> 유니온인 타입 `T`를 받았을 때 `true`를 출력하는 제네릭 `IsUnion<T>`를 구현하세요.
+> ユニオンのタイプ`T`を受け、`true`を出力するジェネリック`IsUnion<T>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type case1 = IsUnion<string>  // false
 type case2 = IsUnion<string|number>  // true
 type case3 = IsUnion<[string|number]>  // false
@@ -726,11 +727,11 @@ type case3 = IsUnion<[string|number]>  // false
 
 ```ts
 // type IsUnion<T> = T extends infer L | infer R ? true : false;
-type IsUnion<T, K = T> 
+type IsUnion<T, K = T> // ユニオンを比較するためにパラメータとして二つ使う
     = T extends K 
-        ? [K] extends [T] 
-            ? false 
-            : true 
+        ? [K] extends [T] // 逆も一緒の場合は一つだけなので
+            ? false // falseをリターン
+            : true // 逆が違うとユニオン
         : never;
 ```
 
@@ -738,11 +739,11 @@ type IsUnion<T, K = T>
 
 ### 1130. ReplaceKeys
 
-> 세 개의 매개변수를 받아 유니온 타입 내의 키들을 바꾸는 제네릭 `ReplaceKeys<U, T, Y>`를 구현하세요.
-> 만약 타입에 `Y`로 설정하고자 하는 키가 없다면 건너뛰세요.
+> 三つのパラメータを受けてユニオンタイプ内のキーを変えるジェネリック`ReplaceKeys<U, T, Y>`を具現してみよう。
+> もしタイプに`Y`に設定しようとするキーがない場合はスルーしましょう。
 
 ```ts
-// 예시
+// 例
 type NodeA = {
   type: 'A'
   name: string
@@ -775,11 +776,11 @@ type ReplacedNotExistKeys = ReplaceKeys<Nodes, 'name', {aa: number}>
 
 ```ts
 type ReplaceKeys<U, T, Y> = {
-    [P in keyof U] : P extends T // U의 키들이 T에 존재한다면
-        ? P extends keyof Y  // 또한 Y의 키가 P(U의 키들)에 있다면
-            ? Y[P] // Y[P]로 키를 설정
-            : never // 아니라면 never
-        : U[P]; // Y의 키가 없다면 U의 키로 유지
+    [P in keyof U] : P extends T // UのキーがTに存在するのであれば
+        ? P extends keyof Y  // またYのキーがP(Uのキー)にあれば
+            ? Y[P] // Y[P]でキーを設定
+            : never // でないと無視(never)
+        : U[P]; // Yのキーがない場合はそのままUのキーで設定
 }
 ```
 
