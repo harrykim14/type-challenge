@@ -790,15 +790,15 @@ type ReplaceKeys<U, T, Y> = {
 </details>
 
 <details>
-<summary>31~40번째 챌린지</summary>
+<summary>31~40番目のチャレンジ</summary>
 <div markdown="31-40">
 
 ### 1367. Remove Index Signature
 
-> 객체 타입들에서 숫자나 문자열의 키로 접근 가능한 인덱스 시그니처(index signature)를 삭제하는 제네릭 `RemoveIndexSignature<T>`를 구현하세요
+> オブジェクトタイプから数字や文字列のキーでアプローチできるインデックスシグネチャー(index signature)を削除するジェネリック`RemoveIndexSignature<T>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type Foo = {
   [key: string]: any;
   foo(): void;
@@ -808,26 +808,26 @@ type A = RemoveIndexSignature<Foo>  // expected { foo(): void }
 ```
 
 ```ts
-// 첫 번째 시도: P가 string이거나 number라면 never를 반환하도록 하였으나 실패
+// 一回目のトライ: Pがstringかnumberならneverを返還するようにしたが失敗
 // type RemoveIndexSignature<T> = {
 //     [P in keyof T] : P extends [string | number] ? never : T[P];
 // }
 type RemoveIndexSignature<T> = {
     [P in keyof T as string extends P ? never : number extends P ? never : P]: T[P];
-    // 타입을 구성하는 삼항연산자에서는 유니온 타입으로 extends 키워드를 사용할 수 없다
+    // タイプを構成する三項演算子ではユニオンタイプでextendsキーワードを使用できない
 }
 ```
 
-- 인덱스 시그니처에 관한 내용은 [이 페이지](https://heropy.blog/2020/01/27/typescript/)와 [이 페이지](https://radlohead.gitbook.io/typescript-deep-dive/type-system/index-signatures)에서 확인할 수 있다.
+- インデックスシグネチャーに関する内容は[このページ](https://heropy.blog/2020/01/27/typescript/)と[このページ](https://radlohead.gitbook.io/typescript-deep-dive/type-system/index-signatures)で参照しました。（どちらも韓国語ページ）
 
 <hr />
 
 ### 1978. Percentage Parser
 
-> 제네릭 `Percentage Parser<T>`를 구현하세요. 정규표현식 `/^(\+|\-)?(\d*)?(\%)?$/`에 따라 `T`를 세 파트로 나누세요. 구조는 반드시 [`plus or miuns`, `number`, `unit` ] 이 되어야 합니다. 해당하지 않는다면 빈 문자열로 남겨두세요.
+> ジェネリック`Percentage Parser<T>`を具現してみよう。正規表現式`/^(\+|\-)?(\d*)?(\%)?$/`により`T`を三つのパートに分けましょう。ストラクチャーは必ず[ `plus or miuns`, `number`, `unit` ]になります。該当しない場合は空の文字列に残しましょう。
 
 ```ts
-// 예시
+// 例
 type PString1 = ''
 type PString2 = '+85%'
 type PString3 = '-85%'
@@ -846,15 +846,15 @@ type Sign = '+' | '-';
 type Unit = '%'
 
 type PercentageParser<A extends string> 
-    = A extends `${Sign}${infer Remains}` // 주어진 문자열 A내에 Sign이 있는지부터 확인
-        ? A extends `${infer Sign}${infer Nums}${Unit}` // Remains 내에 '%' 문자가 있는지 확인
-            ? [Sign, Nums, Unit] // 있다면 세 부분으로 나누기
-            : A extends `${infer Sign}${infer Nums}` // 없다면 Remains가 전부 숫자이므로 
-                ? [Sign, Nums, ''] // Unit 부분을 빈 문자열로 리턴
-                : A extends `${Sign}` // Sign만 있다면 
-                    ? [Sign, '', ''] // Sign만 포함된 배열을 리턴해야하며
-                    : ['', '', ''] // 아무것도 없는 빈 배열이라면 빈 문자열만 포함된 해당 배열을 리턴
-        : A extends `${infer Nums}${Unit}` // Sign이 없지만 Unit은 포함하는 문자열이라면
+    = A extends `${Sign}${infer Remains}` // 与えられた文字列Aの中にSignがあるかから確認
+        ? A extends `${infer Sign}${infer Nums}${Unit}` // Remains内に'%'文字を確認
+            ? [Sign, Nums, Unit] // あるとしたら三つのパートに分ける
+            : A extends `${infer Sign}${infer Nums}` // 無ければRemainsは全部数字なので
+                ? [Sign, Nums, ''] // Unitを空の文字にしてリターン
+                : A extends `${Sign}` // Signだけなら
+                    ? [Sign, '', ''] // Signだけの配列を
+                    : ['', '', ''] // 空の文字だと配列に''を三つ入れてリターン
+        : A extends `${infer Nums}${Unit}` // SignはないけどUnitはある文字列の場合をここで処理
             ? ['', Nums, Unit] 
             : ['', A, ''];
 ```
@@ -863,10 +863,10 @@ type PercentageParser<A extends string>
 
 ### 2070. Drop Char
 
-> 문자열에서 주어진 문자를 없애는 제네릭 `DropChar<S, C>`를 구현하세요.
+> 文字列で与えられた文字を消すジェネリック`DropChar<S, C>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type Butterfly = DropChar<' b u t t e r f l y ! ', ' '> // 'butterfly!'
 ```
 
@@ -879,27 +879,28 @@ type DropChar<S, C extends string>
 
 <hr />
 
-### 2257. MinusOne (미해결)
+### 2257. MinusOne (未解決)
 
-> (반드시 양수인) 숫자가 타입으로 주어질 때 1을 빼는 제네릭 `MinusOne<N>`을 구현하세요.
+> (必ず陽の数字な)数字がタイプで与えられた時、１を引くジェネリック`MinusOne<N>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type Zero = MinusOne<1> // 0
 type FiftyFour = MinusOne<55> // 54
 ```
 
 ```ts
+//　未解決問題
 ```
 
 <hr />
 
 ### 2595. PickByType
 
-> `T`에서 `U`에 해당하는 타입 셋만 가지는 제네릭 `PickByType<T, U>`를 구현하세요.
+> `T`から`U`のタイプだけ持つタイプを構成するジェネリック`PickByType<T, U>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type OnlyBoolean = PickByType<{
   name: string
   count: number
@@ -918,9 +919,10 @@ type PickByType<T, U> = {
 
 ### 2688. StartsWith
 
-> 주어진 문자열 `T`가 정확하게 `U`로 시작하는지 확인하는 제네릭 `StartsWith<T, U>`를 구현하세요.
+> 与えられた文字列`T`が正確に`U`で始まるか検証するジェネリック`StartsWith<T, U>`を具現してみよう。
 
 ```ts
+// 例
 type a = StartsWith<'abc', 'ac'> // expected to be false
 type b = StartsWith<'abc', 'ab'> // expected to be true
 type c = StartsWith<'abc', 'abcd'> // expected to be false
@@ -932,7 +934,11 @@ type StartsWith<T extends string, U extends string> = T extends `${U}${infer rem
 
 ### 2693. EndsWith
 
->주어진 문자열 `T`가 정확하게 `U`로 끝나는지 확인하는 제네릭 `EndsWith<T, U>`를 구현하세요.
+> 与えられた文字列`T`が正確に`U`で終わるか検証するジェネリック`EndsWith<T, U>`を具現してみよう。
+
+```ts
+// 例文なし
+```
 
 ```ts
 type EndsWith<T extends string, U extends string> = T extends `${infer Front}${U}` ? true : false;
@@ -940,10 +946,10 @@ type EndsWith<T extends string, U extends string> = T extends `${infer Front}${U
 
 ### 2757. PartialByKeys 
 
-> 매개변수로 두 타입 `T`와 `K`를 받는 제네릭 `PartialByKeys<T, K>`를 구현하세요. `K`는 타입 `T` 내의 요소이며 반드시 옵셔널로 설정되어야 합니다. `K`가 주어지지 않는다면 제네릭 `Partial<T>`처럼 모든 필드가 옵셔널로 설정되어야 합니다.
+> パラメータで二つのタイプ`T`と`K`を受けるジェネリック`PartialByKeys<T, K>`を具現してみよう。`K`はタイプ`T`内の要素で必ずオプショナルで設定されます。`K`が与えられなかった場合はジェネリック`Partial<T>`のように全てのフィールドがオプショナルで設定されます。
 
 ```ts
-// 예시
+// 例
 interface User {
   name: string
   age: number
@@ -961,16 +967,17 @@ type UserPartialName = PartialByKeys<User, 'name'> // { name?:string; age:number
 //     age: number;
 //     address: string;
 // }
-// 이렇게 타입이 추론되기 때문에 이 &로 떨어진 타입을 하나로 묶어줄 필요가 있다
+// そのままだとタイプ推論がこのような形になるので一つのタイプにくくる必要がある
 
+// 一つにくくるためのジェネリック
 type CombineTypes<T> = {
     [P in keyof T] : T[P]
 }
 
-type PartialByKeys<T, K = keyof T> = CombineTypes<{ // K에 값이 없다면 모든 키 값을 옵셔널 처리 해야 한다
-    [P in keyof T as P extends K ? P : never]?: T[P] // K 값과 동일한 필드를 옵셔널처리
+type PartialByKeys<T, K = keyof T> = CombineTypes<{ // Kが与えられない場合はTを入れてＴを全部オプショナルで設定
+    [P in keyof T as P extends K ? P : never]?: T[P] // Kと同じフィールドをオプショナルで設定
 } & {
-    [P in keyof T as P extends K ? never: P] : T[P] // K값과 다른 필드를 그대로 두기
+    [P in keyof T as P extends K ? never: P] : T[P] // Kと違うフィールドはそのままに
 }>
 ```
 
@@ -978,7 +985,7 @@ type PartialByKeys<T, K = keyof T> = CombineTypes<{ // K에 값이 없다면 모
 
 ### 2759. RequiredByKeys 
 
-> 매개변수로 두 타입 `T`와 `K`를 받는 제네릭 `RequiredByKeys<T, K>`을 구현하세요. `K`는 타입 `T` 내의 요소이며 반드시 필요한 값으로 설정되어야 합니다. `K`가 주어지지 않는다면 제네릭 `Require<T>`처럼 모든 필드가 반드시 필요한 값으로 설정되어야 합니다.
+> パラメータで二つのタイプ`T`と`K`を受けるジェネリック`RequiredByKeys<T, K>`を具現してみよう。`K`はタイプ`T`の中の要素で必ずRequiredに設定されます。`K`が与えられなかった場合ジェネリック`Require<T>`のように全てのフィールドが必ず必要なフィールドに設定されます。
 
 ```ts
 // 예시
@@ -997,7 +1004,7 @@ type CombineType<T> = {
 }
 
 type RequiredByKeys<T, K = keyof T> = CombineType<{
-    [P in keyof T as P extends K ? P : never] -?: T[P] // 옵셔널 타입을 제거할 때엔 -?를 사용한다
+    [P in keyof T as P extends K ? P : never] -?: T[P] // オプショナルタイプを外すときは-?キーワードを使う
 } & {
     [P in keyof T as P extends K ? never: P] : T[P]
 }>
@@ -1007,10 +1014,10 @@ type RequiredByKeys<T, K = keyof T> = CombineType<{
 
 ### 2793. Mutable
 
-> 모든 요소가 수정 가능한 객체로 만드는 제네릭 `Mutable<T>`를 구현하세요.
+> 全てのフィールドが修正できるオブジェクトにするジェネリック`Mutable<T>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 interface Todo {
   readonly title: string
   readonly description: string
@@ -1022,7 +1029,7 @@ type MutableTodo = Mutable<T> // { title: string; description: string; completed
 
 ```ts
 type Mutable<T> = {
-    -readonly [P in keyof T]: T[P] // 옵셔널 체이닝과 같이 readonly로 제거할 때엔 -readonly 키워드를 사용한다.
+    -readonly [P in keyof T]: T[P] //  readonlyを取り消す時は-readonlyキーワードを使う
 }
 ```
 
