@@ -1037,15 +1037,15 @@ type Mutable<T> = {
 </details>
 
 <details>
-<summary>41~47번째 챌린지</summary>
+<summary>41~47番目のチャレンジ</summary>
 <div markdown="41-47">
 
 ### 2852. OmitByType
 
-> 타입 `T`에서 `U` 타입이 아닌 필드로만 구성하는 제네릭 `OmitByType<T, U>`를 구현하세요.
+> タイプ`T`から`U`タイプではないフィールドだけで構成するジェネリック`OmitByType<T, U>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type OmitBoolean = OmitByType<{
   name: string
   count: number
@@ -1057,16 +1057,16 @@ type OmitBoolean = OmitByType<{
 ```ts
 type OmitByType<T, U> = {
     [P in keyof T as T[P] extends U ? never : P] : T[P]
-} // Omit<T, U>에서 T[P]를 사용하는 것만 다름
+} // Omit<T, U>でT[P]を使うだけ
 ```
 <hr />
 
 ### 2946. ObjectEntries
 
-> 타입 시스템에서 `Object.entries`를 구현하세요.
+> タイプシステムで`Object.entries`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 interface Model {
   name: string;
   age: number;
@@ -1077,7 +1077,7 @@ type modelEntries = ObjectEntries<Model> // ['name', string] | ['age', number] |
 ```
 
 ```ts
-// 첫 번째 시도
+//　一回目のトライ
 type ObjectEntries<T> = {
     [P in keyof T]: [P, T[P]]
 }
@@ -1085,34 +1085,34 @@ type ObjectEntries<T> = {
 // type result = { 
 //     name: ["name", string];
 //     age: ["age", number];
-//     locations: ["locations", string[]]; => null은 표시되지 않음
-// } => { 키: ["키", 값] }으로 표현됨
+//     locations: ["locations", string[]]; => nullは表示されない
+// } => { キー: ["キー", 値] }に推論される
 
-// 두 번째 시도
+// 二回目のトライ
 type ObjectEntries<T> = {
     [P in keyof T]: [P, T[P]]
-}[keyof T] // T의 키 값으로 순회하며 객체 내 배열(["키", 값])을 꺼냄
+}[keyof T] // Tのキーで巡回しオブジェクト内の配列(["キー", 値])を取り出す
 // type result = ObjectEntries<Model>
 // type result = ["name", string] | ["age", number] | ["locations", string[]]
-// 키 "location"의 값으로 string[] 만 출력됨
+// "location"キーの値としてstring[]だけ出力される
 
-// 세 번째 시도
+// 三回目のトライ
 type ObjectEntries<T> = {
-    -readonly [P in keyof T] -? // 타입 T의 필드값을 전부 Mutable하며 Required한 값으로 변경
-    : [P, T[P] extends (infer R | undefined) ? R : never ]  // undefined 값 체크
+    -readonly [P in keyof T] -? // タイプTのフィールドを全部MutableでRequiredな値で変更
+    : [P, T[P] extends (infer R | undefined) ? R : never ]  // undefinedチェック
 }[keyof T] 
 type result = ObjectEntries<Model>
-// null이 표시가 되지 않는 것은 개발 환경 문제 (PlayGround에서는 null이 인식되었음)
+// nullが表示されないのは開発環境問題(PlayGroundではnullが認識される)
 ```
 
 <hr/>
 
 ### 3062. Shift
 
-> 타입 시스템에서 `Array.shift`를 구현하세요.
+> タイプシステムで`Array.shift`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type Result = Shift<[3, 2, 1]> // [2, 1]
 ```
 
@@ -1124,10 +1124,10 @@ type Shift<T> = T extends [infer First, ...infer Remains] ? Remains : never;
 
 ### 3188. Tuple to Nested Object 
 
-> 문자열의 타입만 갖는 튜플 `T`와 타입 `U`가 주어졌을때 재귀적으로 객체를 생성하는 제네릭 `TupleToNestedObject<T, U>`를 구현하세요.
+> 文字列のタイプしかないタプル`T`とタイプ`U`が与えられた時、再帰的にオブジェクトを生成するジェネリック`TupleToNestedObject<T, U>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type a = TupleToNestedObject<['a'], string> // {a: string}
 type b = TupleToNestedObject<['a', 'b'], number> // {a: {b: number}}
 type c = TupleToNestedObject<[], boolean> // boolean. if the tuple is empty, just return the U type
@@ -1140,24 +1140,23 @@ type TupleToNestedObject<T, U>
             ? { [P in First]:TupleToNestedObject<Remains, U> }
             : never
         : U
-// 재귀적으로 배열을 쪼개는 것 까지는 구현했으나 
-// 그 이후에 First값이 string인지(key값으로 설정할 배열 내 요소)를 구분하여야 했음
+// 再帰で配列を分ける所まではできたがその以降Firstの値が文字か否かを検証する必要があった
 ```
 
 <hr/>
 
 ### 3192. Reverse
 
-> 타입 시스템에서 `Array.reverse`를 구현하세요.
+> タイプシステムで`Array.reverse`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type a = Reverse<['a', 'b']> // ['b', 'a']
 type b = Reverse<['a', 'b', 'c']> // ['c', 'b', 'a']
 ```
 
 ```ts
-// 첫 번째 방법: 배열을 세 부분으로 나누는 법
+// 一回目のトライ: 配列を三つに分ける方法
 type Reverse<T> 
     = T extends [infer Front, ...infer Remains, infer Last] 
         ? Remains extends [] 
@@ -1165,7 +1164,7 @@ type Reverse<T>
             : [Last, ...Reverse<Remains>, Front] 
         : T;
 
-// 두 번째 방법: 배열을 두 부분으로 나누는 법
+// 二回目のトライ: 配列を二つに分ける方法
 type Reverse<T> = T extends [infer First, ...infer Remains] 
                     ? [...Reverse<Remains>, First]
                     : [];
@@ -1175,10 +1174,10 @@ type Reverse<T> = T extends [infer First, ...infer Remains]
 
 ### 3196. Flip Arguments
 
-> 로대쉬의 `_.flip`을 타입 시스템에서 구현하세요. `FlipArguments<T>` 제네릭은 매개변수의 타입이 반대로 된 새 함수를 반환합니다.
+> lodashの`_.flip`をタイプシステムで具現してみよう。ジェネリック`FlipArguments<T>`はパラメータのタイプが反対になった新しい関数をリターンします。
 
 ```ts
-// 예시
+// 例
 type Flipped = FlipArguments<(arg0: string, arg1: number, arg2: boolean) => void> 
 // (arg0: boolean, arg1: number, arg2: string) => void
 ```
@@ -1189,9 +1188,10 @@ type FlipArguments<T>
         ? P extends []
             ? () => R
             : (...args: Reverse<P>) => R 
-            // Spread Operation으로 매개변수를 배열로 만들면 이 배열 내 요소들만 뒤집어주면 된다
+            // スプレッド構文でパラメータを配列にしてこの配列の並びをを逆にするだけ
         : never;
 
+// 配列になったパラメータを逆にするReverseジェネリックを別に定義
 type Reverse<Args> 
   = Args extends [infer First, ...infer Remains] 
     ? [...Reverse<Remains>, First] 
@@ -1202,10 +1202,10 @@ type Reverse<Args>
 
 ### 3243. FlattenDepth
 
-> 주어진 숫자만큼 재귀적으로 배열을 평평하게 만드는 제네릭 `FlattenDepth<T>`를 구현하세요.
+> 与えられた数字だけ配列を平たくするジェネリック`FlattenDepth<T>`を具現してみよう。
 
 ```ts
-// 예시
+// 例
 type a = FlattenDepth<[1, 2, [3, 4], [[[5]]]], 2> // [1, 2, 3, 4, [5]]. flattern 2 times
 type b = FlattenDepth<[1, 2, [3, 4], [[[5]]]]> // [1, 2, 3, 4, [[5]]]. Depth defaults to be 1
 ```
@@ -1216,22 +1216,23 @@ type b = FlattenDepth<[1, 2, [3, 4], [[[5]]]]> // [1, 2, 3, 4, [[5]]]. Depth def
 //         ? First extends unknown[]
 //             ? [First, ...FlattenDepth<Remains, U>] 
 //             // Type instantiation is excessively deep and possibly infinite.
-//             // 무한루프에 빠져버림
+//             // ここで無限ループに陥る
 //             : [...FlattenDepth<First, U>, ...FlattenDepth<Remains, U>]
 //         : [First, ...FlattenDepth<Remains, U>]
 
-type FlattenDepth<T, K extends number = 1, U extends unknown[] = []> // 무한 루프를 회피하기 위해 빈 배열을 받아 이 배열의 길이를 이용
-    = T extends [infer First, ...infer Remains] // 두 부분으로 나누고
-        ? First extends unknown[] // 만약 First가 배열이고
-            ? U['length'] extends K // 그리고 배열 U의 길이가 K와 같다면 (처음엔 길이가 0이다)
-                ? [First, ...FlattenDepth<Remains, K, U>] // 한 번의 flatten 과정이 있었으므로 배열의 나머지 부분으로 재귀
+// 無限ループを回避するために空の配列を定義し、この配列の長さを利用
+type FlattenDepth<T, K extends number = 1, U extends unknown[] = []> 
+    = T extends [infer First, ...infer Remains] // 二つに分ける
+        ? First extends unknown[] // もしもFirstが配列で
+            ? U['length'] extends K // そして配列Uの長さがKと同じなら(最初は長さが０)
+                ? [First, ...FlattenDepth<Remains, K, U>] // 一回flattenを行うと残りで再帰
                 : [...FlattenDepth<First, K, [0, ...U]>, ...FlattenDepth<Remains, K, U>] 
-                // U의 길이가 K와 다르다면 U에 임의로 0을 추가하여 길이를 늘림 (무한루프 탈출을 위함)
-            : [First, ...FlattenDepth<Remains, K, U>] // First가 배열이 아니라면 나머지 요소에 배열이 있을 수도 있으니 나머지 요소로 재귀
-        : T; // First가 배열이 아니라면 T를 그대로 반환
+                // Uの長さがKと違うとUに0を追加して長さを増やす(無限ループ回避の為)
+            : [First, ...FlattenDepth<Remains, K, U>] // Firstが配列ではない場合残りの要素が配列かもしれないので残りで再帰
+        : T; // Firstが配列ではない場合そのままTをリターン
 
 type result = FlattenDepth<[1, 2, [3, 4], [[[5]]]], 2>;
-// [[[5]]]와 같이 배열 내에 하나의 요소만 갖는 2중 이상의 배열을 가진다면 ...FlattenDepth<Remains, K, U>는 실행되지 않을 수도 있다
+// [[[5]]]みたいに配列の中に一つだけの要素を持つ二重以上の配列は...FlattenDepth<Remains, K, U>が実行されない場合もある
 ```
 
 </div>
